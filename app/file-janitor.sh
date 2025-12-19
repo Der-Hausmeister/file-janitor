@@ -2,15 +2,26 @@
 echo 'File Janitor, 2025'
 echo -e 'Powered by Bash\n'
 
-list() {
-  if [ -n "$1" ] && [ ! -e "$1" ]; then
+is_validate_directory() {
+    if [ -n "$1" ] && [ ! -e "$1" ]; then
         echo -e "$1 is not found"
-        return 0
-  fi
-  if [ -n "$1" ] && [ ! -d "$1" ]; then
-      echo -e "$1 is not a directory"
-      return 0
-  fi
+        return 1
+    fi
+
+    if [ -n "$1" ] && [ ! -d "$1" ]; then
+        echo -e "$1 is not a directory"
+        return 1
+    fi
+
+    return 0
+}
+
+list() {
+    # Validate directory first
+    ## call own command and not "test", therefore no use of "[ ]"
+    if ! is_validate_directory "$1"; then
+        return 1
+    fi
 
   DIR=$1;
   if [ -z "$DIR" ]; then
@@ -25,6 +36,8 @@ list() {
 
 printFilesAndBytes() {
   FILES_COUNT=$(find "$1" -maxdepth 1 -name "*.$2" | wc -w)
+  ## Nice is also: "find  -maxdepth 1 -name '*.ps' -type f -printf "%s"",
+  # but this also does not help with the empty result
   FILES_SIZE=$(find "$1" -maxdepth 1 -name "*.$2" -exec wc -c {} \+ | tail -n 1 | cut -d " " -f 1)
   if [ -z "$FILES_SIZE" ]; then
       FILES_SIZE=0
@@ -33,14 +46,9 @@ printFilesAndBytes() {
 }
 
 report() {
-  if [ -n "$1" ] && [ ! -e "$1" ]; then
-      echo -e "$1 is not found"
-      return 0
-  fi
-  if [ -n "$1" ] && [ ! -d "$1" ]; then
-      echo -e "$1 is not a directory"
-      return 0
-  fi
+    if ! is_validate_directory "$1"; then
+        return 1
+    fi
 
   DIR=$1
   if [ -z "$1" ]; then
