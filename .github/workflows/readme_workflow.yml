@@ -4,6 +4,7 @@ jobs:
   print-readme:
     runs-on: ubuntu-latest
     steps:
+      ## Checkout repository so that code is available to runner
       - uses: actions/checkout@v4
       - name: Print Readme using echo
         run: echo "$(<README.md)"
