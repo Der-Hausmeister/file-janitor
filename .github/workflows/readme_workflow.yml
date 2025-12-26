@@ -1,0 +1,11 @@
+name: readme_workflow
+on: [push]
+jobs:
+  print-readme:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Print Readme using echo
+        run: echo "$(<README.md)"
+      - name: Hello world using cat
+        run: cat README.md
